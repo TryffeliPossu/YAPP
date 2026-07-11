@@ -26,7 +26,7 @@ namespace YAPP
         public override string Name { get; } = "YAPP";
         public override string Description { get; } = "Yet Another Pill Plugin. Adds new SCP-500 instances with unique effects.";
         public override string Author { get; } = "Uippao";
-        public override Version Version { get; } = new Version(1, 0, 0, 0);
+        public override Version Version { get; } = new Version(1, 1, 0, 0);
         public override Version RequiredApiVersion { get; } = new Version(LabApiProperties.CompiledVersion);
 
         public static YAPP Instance { get; private set; }
@@ -62,54 +62,51 @@ namespace YAPP
             {
                 Utils.DebugLog($"Evaluating spawn: {spawn.PillName}");
 
-                if (spawn.Conditions != null && spawn.Conditions.Count > 0 &&
+                if (spawn.Conditions != null &&
+                    spawn.Conditions.Count > 0 &&
                     !spawn.Conditions.All(Utils.EvaluateCondition))
                 {
                     Utils.DebugLog($"Rejected by conditions: {spawn.PillName}");
                     continue;
                 }
 
-                if (Random.NextDouble() > spawn.Chance)
-                {
-                    Utils.DebugLog($"Rejected by chance ({spawn.Chance}): {spawn.PillName}");
-                    continue;
-                }
-
-                string pillName = spawn.PillName;
-
-                if (pillName.Equals("random", StringComparison.OrdinalIgnoreCase))
-                {
-                    pillName = Utils.GetRandomPillName();
-                    Utils.DebugLog($"Random pill resolved to: {pillName}");
-
-                    if (pillName == null)
-                    {
-                        Utils.DebugLog("Random pill resolution failed (no pills available)");
-                        continue;
-                    }
-                }
-
                 if (spawn.Locations == null || spawn.Locations.Count == 0)
                 {
-                    Utils.DebugLog($"No locations defined for: {pillName}");
+                    Utils.DebugLog($"No locations defined for: {spawn.PillName}");
                     continue;
                 }
 
-                var location = spawn.Locations[YAPP.Random.Next(spawn.Locations.Count)];
-
-                Utils.DebugLog(
-                    $"Spawning {pillName} in {location.Room} at {location.Position}"
-                );
-
-                Pickup p = Utils.SpawnPillInRoom(
-                    pillName,
-                    location.Room,
-                    location.Position
-                );
-
-                if (p == null)
+                if (spawn.Amount == -1)
                 {
-                    Utils.DebugLog($"FAILED spawn: {pillName} in {location.Room}");
+                    if (Random.NextDouble() > spawn.Chance)
+                    {
+                        Utils.DebugLog($"Rejected by chance ({spawn.Chance}): {spawn.PillName}");
+                        continue;
+                    }
+
+                    foreach (var location in spawn.Locations)
+                    {
+                        Utils.SpawnSinglePill(spawn.PillName, location);
+                    }
+
+                    continue;
+                }
+                
+                if (spawn.Amount == 0)
+                {
+                    Utils.DebugLog($"Amount was 0 for {spawn.PillName}, skipping.");
+                    continue;
+                }
+
+                int amount = Math.Max(1, spawn.Amount);
+
+                for (int i = 0; i < amount; i++)
+                {
+                    if (Random.NextDouble() > spawn.Chance)
+                        continue;
+
+                    var location = spawn.Locations[Random.Next(spawn.Locations.Count)];
+                    Utils.SpawnSinglePill(spawn.PillName, location);
                 }
             }
         }

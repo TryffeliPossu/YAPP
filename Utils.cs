@@ -56,6 +56,37 @@ namespace YAPP
             return pickup;
         }
         
+        public static void SpawnSinglePill(string configuredName, SpawnLocation location)
+        {
+            string pillName = configuredName;
+
+            if (pillName.Equals("random", StringComparison.OrdinalIgnoreCase))
+            {
+                pillName = Utils.GetRandomPillName();
+
+                if (pillName == null)
+                {
+                    Utils.DebugLog("Random pill resolution failed (no pills available)");
+                    return;
+                }
+            }
+
+            Utils.DebugLog(
+                $"Spawning {pillName} in {location.Room} at {location.Position}"
+            );
+
+            Pickup p = Utils.SpawnPillInRoom(
+                pillName,
+                location.Room,
+                location.Position
+            );
+
+            if (p == null)
+            {
+                Utils.DebugLog($"FAILED spawn: {pillName} in {location.Room}");
+            }
+        }
+        
         public static bool EvaluateCondition(SpawnCondition condition)
         {
             if (condition == null)

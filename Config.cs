@@ -32,6 +32,7 @@ namespace YAPP
     public class PillSpawnConfig
     {
         public float Chance { get; set; } = 1f;
+        public int Amount { get; set; } = 1;
         public string PillName { get; set; } = "random";
 
         public List<SpawnLocation> Locations { get; set; } = new List<SpawnLocation>();
