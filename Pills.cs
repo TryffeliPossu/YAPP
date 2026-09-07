@@ -27,8 +27,9 @@ namespace YAPP.Pills
 
         public override void OnUsed(PlayerUsedItemEventArgs ev)
         {
-            ev.Player.EnableEffect<MovementBoost>(200, 7.5f);
+            ev.Player.EnableEffect<MovementBoost>(200, 7f);
             ev.Player.EnableEffect<Invigorated>(1, 5f);
+            ev.Player.EnableEffect<Deafened>(1, 7f);
         }
     }
     
