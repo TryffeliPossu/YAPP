@@ -50,7 +50,7 @@ namespace YAPP.Commands
                     Utils.GrenadeTrail(player, grenadeType, count, interval);
                 }
 
-                response = $"Spawned grenade trail on ALL pigs (count={count}, interval={interval}, type={grenadeType}).";
+                response = $"Spawned grenade trail on ALL players (count={count}, interval={interval}, type={grenadeType}).";
                 return true;
             }
 
